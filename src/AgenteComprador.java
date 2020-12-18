@@ -46,7 +46,7 @@ public class AgenteComprador extends Agent{
                 if(comprado!=null) {	
                     System.out.println("Mensaje del vendedor:  " + reply.getContent());
                     //JOptionPane.showMessageDialog(null,"Mensaje recivido" + reply.getContent());
-                    doDelete();                    
+                    //doDelete();                    
                 }else{                    
                     block();
                 }                                                
@@ -76,7 +76,7 @@ public class AgenteComprador extends Agent{
     }
     public void inicializarPresupuesto(){
         //genera un presupuesto de entre 10.000 y 30.000
-        presupuesto =ThreadLocalRandom.current().nextInt(1000, 3000 + 1);
+        presupuesto =ThreadLocalRandom.current().nextInt(10000, 30000 + 1);
     }
     
     public void retirarDinero(int cant){

@@ -10,7 +10,7 @@ public class AgenteVendedor extends Agent {
     private int maxOferta;
     private int ofertaPrevia;
     public long tiempoModificado = getHoraActual()+1000000000;
-    
+    public ACLMessage maximoOfertante;  
     @Override
     protected void setup() {
         System.out.println("Hola soy el agente vendedor");
@@ -18,48 +18,55 @@ public class AgenteVendedor extends Agent {
         addBehaviour(new CyclicBehaviour() {			
             @Override
             public void action() {
-                //Recibe un mensaje
-                ACLMessage msg = receive();
-                ACLMessage ultimoOfertante = new ACLMessage();
-                if(msg!=null) {
-                    ultimoOfertante = msg;
-                    System.out.println("Mensaje del comprador:  " + msg.getContent());
-                    int precio = 0;
-                    try {
-                        precio = Integer.parseInt(msg.getContent().replaceAll("\\D+",""));
-                    } catch (NumberFormatException ex) {
-                        System.err.println("Invalid string in argumment");  
-                    }
+                inicializarProducto();
+                if(!producto.getVendido()){
+                    //Recibe un mensaje
+                    ACLMessage msg = receive();
+                    ACLMessage ultimoOfertante = new ACLMessage();   
                     
-                    //System.out.println("PRECIO OFERTADO:   " +precio);
-                    if(precio>maxOferta){
-                        setOfertaPrevia(getMaxOferta());
-                        setMaxOferta(precio);
-                        System.out.println("OFERTA MAXIMA: "+maxOferta);
-                        setTiempoModificado(getHoraActual());
-                    }                    
-                    //JOptionPane.showMessageDialog(null,"Mensaje del comprador recibido:  " + msg.getContent());	
-                    //Envia la respuesta
-                    ACLMessage reply = new ACLMessage( ACLMessage.INFORM);
-                    reply.setContent( "Hola recibi tu oferta, la oferta maxima actual es: "+maxOferta);
-                    reply.addReceiver(msg.getSender());
-                    send(reply);
-                }else  block();
-                
-                if(verificarModif()){
-                    if(ultimoOfertante.getSender()!=null){
-                      System.out.println("Ya no hay ofertas terminando");
-                        ACLMessage aceptar = new ACLMessage( ACLMessage.AGREE);
-                        aceptar.setContent( "Hola  tu oferta fue la ganadora: "+maxOferta);
-                        aceptar.addReceiver(ultimoOfertante.getSender());
-                        System.out.println("El agente "+ultimoOfertante.getSender().getLocalName()+" fue el comprador" );
-                        send(aceptar);
-                        //doDelete();  
-                    }else{
-                        System.exit(0);
+                    if(msg!=null) {
+                        ultimoOfertante = msg;
+                        System.out.println("Mensaje del comprador:  " + msg.getContent());
+                        int precio = 0;
+                        //obtiene la cantidad ofrecida del mensaje
+                        try {
+                            precio = Integer.parseInt(msg.getContent().replaceAll("\\D+",""));
+                        } catch (NumberFormatException ex) {
+                            System.err.println("Invalid string in argumment");  
+                        }
+
+                        //System.out.println("PRECIO OFERTADO:   " +precio);
+                        //veridica si la cant. es mayor a la actaul
+                        if(precio>maxOferta){
+                            setOfertaPrevia(getMaxOferta());
+                            setMaxOferta(precio);
+                            maximoOfertante= msg;
+                            System.out.println("OFERTA MAXIMA: "+maxOferta+" DEL COMPRADOR: "+maximoOfertante.getSender().getLocalName());
+                            setTiempoModificado(getHoraActual());
+                        }                    
+                        //JOptionPane.showMessageDialog(null,"Mensaje del comprador recibido:  " + msg.getContent());	
+                        //Envia la respuesta
+                        ACLMessage reply = new ACLMessage( ACLMessage.INFORM);
+                        reply.setContent( "Hola recibi tu oferta, la oferta maxima actual es: "+maxOferta);
+                        reply.addReceiver(msg.getSender());
+                        send(reply);
+                    }else  block();
+                    //verifica si no hubo ofertas en los ultimos 15 segundos
+                    if(verificarModif()){
+                        if(maximoOfertante.getSender()!=null){
+                            System.out.println("Ya no hay ofertas terminando");
+                            ACLMessage aceptar = new ACLMessage( ACLMessage.AGREE);
+                            aceptar.setContent( "Hola  tu oferta fue la ganadora: "+maxOferta);
+                            aceptar.addReceiver(maximoOfertante.getSender());
+                            System.out.println("El agente "+maximoOfertante.getSender().getLocalName()+" fue el comprador" );
+                            send(aceptar);
+                            producto.setVendido(true);
+                            System.exit(0);
+                            //doDelete();  
+                        }
                     }
-                    
                 }
+                
             }
         });
     }
@@ -77,10 +84,8 @@ public class AgenteVendedor extends Agent {
     }
     
     public long getHoraActual(){
-        Date date = new Date();
-        long hora = date.getTime();
-        //System.out.println(hora);
-        return hora;
+        Date date = new Date();            
+        return date.getTime(); 
     }
 
     public void setTiempoModificado(long tiempoModificado) {
@@ -89,7 +94,7 @@ public class AgenteVendedor extends Agent {
     
     
     public void inicializarProducto(){
-        this.producto=new Producto(ThreadLocalRandom.current().nextInt(20000, 30000 + 1), "Producto 1");
+        this.producto=new Producto(false, "Producto 1");
     }
         
 

@@ -1,23 +1,23 @@
 
 public class Producto {
-    private int precio;
+    private boolean vendido;
     private String nombre;
     
-    public Producto(int p, String n){
-        this.precio=p;
+    public Producto(boolean v, String n){
+        this.vendido=v;
         this.nombre=n;
     }
 
-    public int getPrecio() {
-        return precio;
+    public boolean getVendido() {
+        return vendido;
     }
 
     public String getNombre() {
         return nombre;
     }
 
-    public void setPrecio(int precio) {
-        this.precio = precio;
+    public void setVendido(boolean vendido) {
+        this.vendido = vendido;
     }
 
     public void setNombre(String nombre) {
