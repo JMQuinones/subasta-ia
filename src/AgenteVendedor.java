@@ -19,6 +19,7 @@ public class AgenteVendedor extends Agent {
             @Override
             public void action() {
                 inicializarProducto();
+                //verifica si el producto se vendio
                 if(!producto.getVendido()){
                     //Recibe un mensaje
                     ACLMessage msg = receive();
@@ -35,7 +36,7 @@ public class AgenteVendedor extends Agent {
                             System.err.println("Invalid string in argumment");  
                         }
 
-                        //System.out.println("PRECIO OFERTADO:   " +precio);
+                        
                         //veridica si la cant. es mayor a la actaul
                         if(precio>maxOferta){
                             setOfertaPrevia(getMaxOferta());
@@ -44,13 +45,14 @@ public class AgenteVendedor extends Agent {
                             System.out.println("OFERTA MAXIMA: "+maxOferta+" DEL COMPRADOR: "+maximoOfertante.getSender().getLocalName());
                             setTiempoModificado(getHoraActual());
                         }                    
-                        //JOptionPane.showMessageDialog(null,"Mensaje del comprador recibido:  " + msg.getContent());	
+                        	
                         //Envia la respuesta
                         ACLMessage reply = new ACLMessage( ACLMessage.INFORM);
                         reply.setContent( "Hola recibi tu oferta, la oferta maxima actual es: "+maxOferta);
                         reply.addReceiver(msg.getSender());
-                        send(reply);
+                        send(reply);                        
                     }else  block();
+                    
                     //verifica si no hubo ofertas en los ultimos 15 segundos
                     if(verificarModif()){
                         if(maximoOfertante.getSender()!=null){
@@ -58,11 +60,11 @@ public class AgenteVendedor extends Agent {
                             ACLMessage aceptar = new ACLMessage( ACLMessage.AGREE);
                             aceptar.setContent( "Hola  tu oferta fue la ganadora: "+maxOferta);
                             aceptar.addReceiver(maximoOfertante.getSender());
-                            System.out.println("El agente "+maximoOfertante.getSender().getLocalName()+" fue el comprador" );
+                            System.out.println("========El agente "+maximoOfertante.getSender().getLocalName()+" fue el comprador========" );
                             send(aceptar);
                             producto.setVendido(true);
                             System.exit(0);
-                            //doDelete();  
+                              
                         }
                     }
                 }
@@ -77,8 +79,7 @@ public class AgenteVendedor extends Agent {
               return false;
             } else {
               return true;
-            }
-            
+            }            
         }
         return false;
     }

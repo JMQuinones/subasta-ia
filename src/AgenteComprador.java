@@ -25,7 +25,7 @@ public class AgenteComprador extends Agent{
             protected void onTick() {
                 // Envia el mensaje al otro agente
                 ACLMessage msg = new ACLMessage(ACLMessage.REQUEST);
-                if(maxOferta<presupuesto){                    
+                if(maxOferta<=presupuesto){                    
                     msg.setContent("Hola quiero comprar el producto, ofrezco: " + ThreadLocalRandom.current().nextInt(maxOferta, presupuesto));
                     msg.addReceiver(new AID("vendedor",AID.ISLOCALNAME));
                     send(msg); 
@@ -46,28 +46,12 @@ public class AgenteComprador extends Agent{
                 if(comprado!=null) {	
                     System.out.println("Mensaje del vendedor:  " + reply.getContent());
                     //JOptionPane.showMessageDialog(null,"Mensaje recivido" + reply.getContent());
-                    //doDelete();                    
+                    doDelete();                    
                 }else{                    
                     block();
                 }                                                
             }
-        } );
-                /*addBehaviour(new CyclicBehaviour() {				
-                        @Override
-                        public void action() {
-                                // Envia el mensaje al otro agente
-                                ACLMessage msg = new ACLMessage(ACLMessage.INFORM);
-                                msg.setContent(" Hola quiero comprar el producto, ofrezco: " +ThreadLocalRandom.current().nextInt(1000, 3000 + 1));
-                                msg.addReceiver(new AID("vendedor",AID.ISLOCALNAME));
-                                send(msg);
-
-                                ACLMessage reply = receive();
-                                if(reply!=null) {	
-                                        System.out.println("Mensaje del vendedor:  " + reply.getContent());
-                                        JOptionPane.showMessageDialog(null,"Mensaje recivido" + reply.getContent());							
-                                }else  block();
-                        }
-                });*/
+        } );                
 
     }
     
